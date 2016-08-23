@@ -196,8 +196,8 @@ class Client(X224Layer):
         data.readType(message)
         
         if message.protocolNeg.failureCode._is_readed:
-            raise RDPSecurityNegoFail("negotiation failure code %x"%message.protocolNeg.failureCode.value)
-        
+            pass
+
         #check presence of negotiation response
         if message.protocolNeg._is_readed:
             self._selectedProtocol = message.protocolNeg.selectedProtocol.value
