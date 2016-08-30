@@ -219,7 +219,8 @@ class MCSLayer(LayerAutomata):
         data.readType(opcode)
         
         if self.readMCSPDUHeader(opcode.value, DomainMCSPDU.DISCONNECT_PROVIDER_ULTIMATUM):
-            log.info("MCS DISCONNECT_PROVIDER_ULTIMATUM")
+#            log.info("MCS DISCONNECT_PROVIDER_ULTIMATUM")
+            log.info("Client Disconnected")
             self._transport.close()
             return
         
