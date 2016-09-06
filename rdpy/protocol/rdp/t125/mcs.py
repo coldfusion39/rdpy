@@ -226,7 +226,8 @@ class MCSLayer(LayerAutomata):
         
         #client case
         elif not self.readMCSPDUHeader(opcode.value, self._receiveOpcode):
-            raise InvalidExpectedDataException("Invalid expected MCS opcode receive data")
+            log.info("Invalid expected MCS opcode receive data")
+            pass
         
         #server user id
         per.readInteger16(data, Channel.MCS_USERCHANNEL_BASE)
@@ -366,10 +367,12 @@ class Client(MCSLayer):
         ber.readInteger(data)
         self.readDomainParams(data)
         if not ber.readUniversalTag(data, ber.Tag.BER_TAG_OCTET_STRING, False):
-            raise InvalidExpectedDataException("invalid expected BER tag")
+            log.info("invalid expected BER tag")
+            pass
         gccRequestLength = ber.readLength(data)
         if data.dataLen() != gccRequestLength:
             raise InvalidSize("bad size of GCC request")
+            pass
         self._serverSettings = gcc.readConferenceCreateResponse(data)
         
         #send domain request
@@ -389,10 +392,12 @@ class Client(MCSLayer):
         data.readType(opcode)
         
         if not self.readMCSPDUHeader(opcode.value, DomainMCSPDU.ATTACH_USER_CONFIRM):
-            raise InvalidExpectedDataException("Invalid MCS PDU : ATTACH_USER_CONFIRM expected")
+            log.info("Invalid MCS PDU : ATTACH_USER_CONFIRM expected")
+            pass
         
         if per.readEnumerates(data) != 0:
-            raise InvalidExpectedDataException("Server reject user")
+            log.info("Server reject user")
+            pass
         
         self._userId = per.readInteger16(data, Channel.MCS_USERCHANNEL_BASE)
             
@@ -408,18 +413,21 @@ class Client(MCSLayer):
         data.readType(opcode)
         
         if not self.readMCSPDUHeader(opcode.value, DomainMCSPDU.CHANNEL_JOIN_CONFIRM):
-            raise InvalidExpectedDataException("Invalid MCS PDU : CHANNEL_JOIN_CONFIRM expected")
+            log.info("Invalid MCS PDU : CHANNEL_JOIN_CONFIRM expected")
+            pass
         
         confirm = per.readEnumerates(data)
         
         userId = per.readInteger16(data, Channel.MCS_USERCHANNEL_BASE)
         if self._userId != userId:
-            raise InvalidExpectedDataException("Invalid MCS User Id")
+            log.info("Invalid MCS User Id")
+            pass
         
         channelId = per.readInteger16(data)
         #must confirm global channel and user channel
         if (confirm != 0) and (channelId == Channel.MCS_GLOBAL_CHANNEL or channelId == self._userId):
-            raise InvalidExpectedDataException("Server must confirm static channel")
+            log.info("Server must confirm static channel")
+            pass
         
         if confirm == 0:
             serverNet = self._serverSettings.getBlock(gcc.MessageType.SC_NET)
@@ -510,7 +518,8 @@ class Server(MCSLayer):
         ber.readOctetString(data)
         
         if not ber.readBoolean(data):
-            raise InvalidExpectedDataException("invalid expected BER boolean tag")
+            log.info("invalid expected BER boolean tag")
+            pass
         
         self.readDomainParams(data)
         self.readDomainParams(data)
@@ -540,7 +549,8 @@ class Server(MCSLayer):
         data.readType(opcode)
         
         if not self.readMCSPDUHeader(opcode.value, DomainMCSPDU.ERECT_DOMAIN_REQUEST):
-            raise InvalidExpectedDataException("Invalid MCS PDU : ERECT_DOMAIN_REQUEST expected")
+            log.info("Invalid MCS PDU : ERECT_DOMAIN_REQUEST expected")
+            pass
         
         per.readInteger(data)
         per.readInteger(data)
@@ -558,7 +568,8 @@ class Server(MCSLayer):
         data.readType(opcode)
         
         if not self.readMCSPDUHeader(opcode.value, DomainMCSPDU.ATTACH_USER_REQUEST):
-            raise InvalidExpectedDataException("Invalid MCS PDU : ATTACH_USER_REQUEST expected")
+            log.info("Invalid MCS PDU : ATTACH_USER_REQUEST expected")
+            pass
         
         self.sendAttachUserConfirm()
         self.setNextState(self.recvChannelJoinRequest)
@@ -574,11 +585,13 @@ class Server(MCSLayer):
         data.readType(opcode)
         
         if not self.readMCSPDUHeader(opcode.value, DomainMCSPDU.CHANNEL_JOIN_REQUEST):
-            raise InvalidExpectedDataException("Invalid MCS PDU : CHANNEL_JOIN_REQUEST expected")
+            log.info("Invalid MCS PDU : CHANNEL_JOIN_REQUEST expected")
+            pass
         
         userId = per.readInteger16(data, Channel.MCS_USERCHANNEL_BASE)
         if self._userId != userId:
-            raise InvalidExpectedDataException("Invalid MCS User Id")
+            log.info("Invalid MCS User Id")
+            pass
         
         channelId = per.readInteger16(data)
         #actually algo support virtual channel but RDPY have no virtual channel
